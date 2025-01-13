@@ -31,9 +31,9 @@
 <body>
     <div id="input-container">
         <input type="text" id="userName" placeholder="Enter your name">
-        <input type="text" id="textInput" placeholder="Enter text">
+        <input type="text" id="textInput" placeholder="Enter text" onkeydown="if (event.key === 'Enter') saveText();">
         <button onclick="saveText()">Send</button>
-        <button onclick="clearList()">Clear Messages</button>
+        <button onclick="clearList()">Clear List</button>
     </div>
     <ul id="textList"></ul>
 
