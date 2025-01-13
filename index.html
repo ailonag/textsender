@@ -29,14 +29,13 @@
     </style>
 </head>
 <body>
-    <ul id="textList"></ul>
     <div id="input-container">
         <input type="text" id="userName" placeholder="Enter your name">
         <input type="text" id="textInput" placeholder="Enter text">
         <button onclick="saveText()">Send</button>
         <button onclick="clearList()">Clear List</button>
     </div>
-    
+    <ul id="textList"></ul>
 
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
@@ -48,7 +47,7 @@
         });
 
         socket.on('newText', (newText) => {
-            addTextToList(newText);
+            addTextToList(newText, true); // Add the new text at the top
         });
 
         socket.on('clearTexts', () => {
@@ -108,18 +107,25 @@
             const textListElement = document.getElementById('textList');
             textListElement.innerHTML = '';
 
-            textList.forEach(entry => {
-                addTextToList(entry);
+            // Reverse the textList to show the newest message at the top
+            textList.reverse().forEach(entry => {
+                addTextToList(entry, false); // Add the text at the bottom initially
             });
         }
 
-        function addTextToList(entry) {
+        function addTextToList(entry, atTop = false) {
             const textListElement = document.getElementById('textList');
             const listItem = document.createElement('li');
             listItem.textContent = `${entry.user}: ${entry.text}`;
             listItem.style.color = entry.color;
-            textListElement.appendChild(listItem);
+
+            if (atTop) {
+                textListElement.insertBefore(listItem, textListElement.firstChild); // Add at the top
+            } else {
+                textListElement.appendChild(listItem); // Add at the bottom
+            }
         }
     </script>
 </body>
 </html>
+
