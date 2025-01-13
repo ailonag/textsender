@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="styles/style1.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Saver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #input-container {
+            margin-bottom: 20px;
+            text-align: left;
+
+        }
+        input[type="text"] { width: 800px; /* Set the desired width */ height: 16px; /* Set the desired height */ padding: 5px; font-size: 16px; }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #dddddd;
+            margin-bottom: 5px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="input-container">
+        <input type="text" id="userName" placeholder="Enter your name">
+        <input type="text" id="textInput" placeholder="Enter text">
+        <button onclick="saveText()">Send</button>
+        <button onclick="clearList()">Clear Texts</button>
+    </div>
+    <ul id="textList"></ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            loadTextList();
+        });
+
+        function saveText() {
+            const textInput = document.getElementById('textInput');
+            const userNameInput = document.getElementById('userName');
+            const textValue = textInput.value.trim();
+            const userName = userNameInput.value.trim();
+
+            if (textValue && userName) {
+                let textList = getTextList();
+                const userColor = getUserColor(userName);
+
+                if (textList.length === 10) {
+                    textList = []; // Clear the list if it has 10 items
+                }
+
+                textList.push({ user: userName, text: textValue, color: userColor });
+                localStorage.setItem('textList', JSON.stringify(textList));
+                textInput.value = '';
+                renderTextList();
+            }
+        }
+
+        function clearList() {
+            localStorage.removeItem('textList');
+            renderTextList();
+        }
+
+        function loadTextList() {
+            const textList = getTextList();
+            if (textList.length > 0) {
+                renderTextList();
+            }
+        }
+
+        function getTextList() {
+            const textList = localStorage.getItem('textList');
+            return textList ? JSON.parse(textList) : [];
+        }
+
+        function getUserColor(userName) {
+            const userColors = JSON.parse(localStorage.getItem('userColors')) || {};
+            if (!userColors[userName]) {
+                userColors[userName] = getRandomColor();
+                localStorage.setItem('userColors', JSON.stringify(userColors));
+            }
+            return userColors[userName];
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function renderTextList() {
+            const textList = getTextList();
+            const textListElement = document.getElementById('textList');
+            textListElement.innerHTML = '';
+
+            textList.forEach(entry => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${entry.user}: ${entry.text}`;
+                listItem.style.color = entry.color;
+                textListElement.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+</html>
