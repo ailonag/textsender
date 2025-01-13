@@ -47,7 +47,7 @@
         });
 
         socket.on('newText', (newText) => {
-            addTextToList(newText, true); // Add the new text at the top
+            handleNewText(newText);
         });
 
         socket.on('clearTexts', () => {
@@ -109,7 +109,7 @@
 
             // Reverse the textList to show the newest message at the top
             textList.reverse().forEach(entry => {
-                addTextToList(entry, false); // Add the text at the bottom initially
+                addTextToList(entry, false);
             });
         }
 
@@ -120,12 +120,21 @@
             listItem.style.color = entry.color;
 
             if (atTop) {
-                textListElement.insertBefore(listItem, textListElement.firstChild); // Add at the top
+                textListElement.insertBefore(listItem, textListElement.firstChild);
             } else {
-                textListElement.appendChild(listItem); // Add at the bottom
+                textListElement.appendChild(listItem);
             }
+        }
+
+        function handleNewText(newText) {
+            const textListElement = document.getElementById('textList');
+            const textList = textListElement.children;
+            
+            if (textList.length === 10) {
+                renderTextList([]);
+            }
+            addTextToList(newText, true);
         }
     </script>
 </body>
 </html>
-
