@@ -33,51 +33,48 @@
         <input type="text" id="userName" placeholder="Enter your name">
         <input type="text" id="textInput" placeholder="Enter text">
         <button onclick="saveText()">Send</button>
-        <button onclick="clearList()">Clear Texts</button>
+        <button onclick="clearList()">Clear List</button>
     </div>
     <ul id="textList"></ul>
 
     <script>
+        const apiUrl = 'http://localhost:3000';
+
         document.addEventListener('DOMContentLoaded', (event) => {
             loadTextList();
         });
 
-        function saveText() {
+        async function saveText() {
             const textInput = document.getElementById('textInput');
             const userNameInput = document.getElementById('userName');
             const textValue = textInput.value.trim();
             const userName = userNameInput.value.trim();
 
             if (textValue && userName) {
-                let textList = getTextList();
                 const userColor = getUserColor(userName);
 
-                if (textList.length === 10) {
-                    textList = []; // Clear the list if it has 10 items
-                }
+                const response = await fetch(`${apiUrl}/texts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user: userName, text: textValue, color: userColor })
+                });
 
-                textList.push({ user: userName, text: textValue, color: userColor });
-                localStorage.setItem('textList', JSON.stringify(textList));
-                textInput.value = '';
+                const newText = await response.json();
                 renderTextList();
             }
         }
 
-        function clearList() {
-            localStorage.removeItem('textList');
-            renderTextList();
+        async function loadTextList() {
+            const response = await fetch(`${apiUrl}/texts`);
+            const textList = await response.json();
+            renderTextList(textList);
         }
 
-        function loadTextList() {
-            const textList = getTextList();
-            if (textList.length > 0) {
-                renderTextList();
-            }
-        }
-
-        function getTextList() {
-            const textList = localStorage.getItem('textList');
-            return textList ? JSON.parse(textList) : [];
+        async function clearList() {
+            await fetch(`${apiUrl}/texts`, { method: 'DELETE' });
+            renderTextList([]);
         }
 
         function getUserColor(userName) {
@@ -98,8 +95,7 @@
             return color;
         }
 
-        function renderTextList() {
-            const textList = getTextList();
+        function renderTextList(textList = []) {
             const textListElement = document.getElementById('textList');
             textListElement.innerHTML = '';
 
@@ -110,13 +106,6 @@
                 textListElement.appendChild(listItem);
             });
         }
-        const apiUrl = 'http://localhost:3000'; // Use your backend server URL if deployed
-
-        async function saveText() {
-            const textInput = document.getElementById('textInput');
-            const userNameInput = document.getElementById('userName');
-            const textValue = textInput.value
-    }
     </script>
 </body>
 </html>
