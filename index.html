@@ -37,11 +37,21 @@
     </div>
     <ul id="textList"></ul>
 
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
         const apiUrl = 'http://localhost:3000';
+        const socket = io(apiUrl);
 
         document.addEventListener('DOMContentLoaded', (event) => {
             loadTextList();
+        });
+
+        socket.on('newText', (newText) => {
+            addTextToList(newText);
+        });
+
+        socket.on('clearTexts', () => {
+            renderTextList([]);
         });
 
         async function saveText() {
@@ -53,7 +63,7 @@
             if (textValue && userName) {
                 const userColor = getUserColor(userName);
 
-                const response = await fetch(`${apiUrl}/texts`, {
+                await fetch(`${apiUrl}/texts`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -61,8 +71,7 @@
                     body: JSON.stringify({ user: userName, text: textValue, color: userColor })
                 });
 
-                const newText = await response.json();
-                renderTextList();
+                textInput.value = '';
             }
         }
 
@@ -74,7 +83,6 @@
 
         async function clearList() {
             await fetch(`${apiUrl}/texts`, { method: 'DELETE' });
-            renderTextList([]);
         }
 
         function getUserColor(userName) {
@@ -100,11 +108,16 @@
             textListElement.innerHTML = '';
 
             textList.forEach(entry => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `${entry.user}: ${entry.text}`;
-                listItem.style.color = entry.color;
-                textListElement.appendChild(listItem);
+                addTextToList(entry);
             });
+        }
+
+        function addTextToList(entry) {
+            const textListElement = document.getElementById('textList');
+            const listItem = document.createElement('li');
+            listItem.textContent = `${entry.user}: ${entry.text}`;
+            listItem.style.color = entry.color;
+            textListElement.appendChild(listItem);
         }
     </script>
 </body>
