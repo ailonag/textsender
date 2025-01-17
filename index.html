@@ -9,13 +9,13 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: rgb(255, 255, 255);
         }
         #input-container {
             margin-bottom: 20px;
             text-align: left;
-
         }
-        input[type="text"] { width: 800px; /* Set the desired width */ height: 16px; /* Set the desired height */ padding: 5px; font-size: 16px; }
+        input[type="text"] {width: auto;  height: 16px; /* Set the desired height */ padding: 5px; font-size: 16px; }
         ul {
             list-style-type: none;
             padding: 0;
@@ -26,13 +26,20 @@
             padding: 10px;
             border-radius: 5px;
         }
+        h1 {
+            color: #00539f;
+/*             background-color: #ffffff; */
+            height: 40px;
+            width: 12.7%;
+        }
     </style>
 </head>
 <body>
+    <h1>Messaging</h1>
     <div id="input-container">
-        <input type="text" id="userName" placeholder="Enter your name">
-        <input type="text" id="textInput" placeholder="Enter text" onkeydown="if (event.key === 'Enter') saveText();">
-        <button onclick="saveText()">Send</button>
+        <input type="text" id="userName" placeholder="Enter your name" onkeydown="moveToNext(event, 'textInput')">
+        <input type="text" id="textInput" placeholder="Enter text" onkeydown="if (event.key === 'Enter') { moveToNext(event, 'sendButton'); saveText(); }">
+        <button id="sendButton" onclick="saveText()">Send</button>
         <button onclick="clearList()">Clear List</button>
     </div>
     <ul id="textList"></ul>
@@ -135,6 +142,14 @@
             }
             addTextToList(newText, true);
         }
+
+        function moveToNext(event, nextId) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                document.getElementById(nextId).focus();
+            }
+        }
     </script>
 </body>
 </html>
+
